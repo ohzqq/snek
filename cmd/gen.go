@@ -14,15 +14,14 @@ type Cfg struct {
 }
 
 type Cmd struct {
-	Use        string            `yaml:"Use"`
-	Name       string            `yaml:"Name"`
-	Short      string            `yaml:"Short"`
-	Long       string            `yaml:"Long"`
-	Aliases    string            `yaml:"Aliases"`
-	Run        string            `yaml:"Run"`
-	FlagStruct map[string]string `yaml:"FlagStruct"`
-	Flags      []Flag            `yaml:"Flags"`
-	Parent     string            `yaml:"Parent"`
+	Use     string `yaml:"Use"`
+	Name    string `yaml:"Name"`
+	Short   string `yaml:"Short"`
+	Long    string `yaml:"Long"`
+	Aliases string `yaml:"Aliases"`
+	Run     string `yaml:"Run"`
+	Flags   []Flag `yaml:"Flags"`
+	Parent  string `yaml:"Parent"`
 }
 
 type Flag struct {

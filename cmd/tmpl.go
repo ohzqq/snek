@@ -15,22 +15,25 @@ import (
 )
 
 {{range .Commands}}
-	{{- $cmd := .Name}}
+	{{- $cmd := .Name -}}
 
 var {{$cmd}} = &cobra.Command{
 	{{with .Use}}Use: "{{.}}",{{end}}
+	Run: {{$cmd}}Run,
 	{{with .Aliases}}Aliases: {{.}},{{end}}
 	{{with .Short}}Short: "{{.}}",{{end}}
 	{{with .Long}}Long: "{{.}}",{{end}}
-	Run: {{$cmd}}Run,
 }
+{{end}}
 
 func init() {
+{{- range .Commands}}
+	{{- $cmd := .Name}}
 	{{- with .Parent}}
-		{{.}}.AddCommand({{$cmd}})
+	{{.}}.AddCommand({{$cmd}})
 	{{- end}}
 
-	{{range .Flags}}
+	{{- range .Flags}}
 	{{$cmd}}.
 		{{- with .Persistent}}Persistent{{end -}}
 	Flags().{{.Type}}(
@@ -41,10 +44,10 @@ func init() {
 	)
 		{{if .Viper}}
 	viper.BindPFlag("{{.Name}}", {{$cmd}}.Flags().Lookup("{{.Name}}"))
-		{{end}}
-		{{end}}
+		{{end -}}
+		{{end -}}
+		{{end -}}
 }
-		{{end}}
 {{end}}
 
 {{define "run"}}
