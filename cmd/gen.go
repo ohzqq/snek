@@ -1,36 +1,87 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
+
+type Cfg struct {
+	Viper    bool  `yaml:"Viper"`
+	Commands []Cmd `yaml:"Commands"`
+}
+
+type Cmd struct {
+	Use        string            `yaml:"Use"`
+	Name       string            `yaml:"Name"`
+	Short      string            `yaml:"Short"`
+	Long       string            `yaml:"Long"`
+	Aliases    string            `yaml:"Aliases"`
+	Run        string            `yaml:"Run"`
+	FlagStruct map[string]string `yaml:"FlagStruct"`
+	Flags      []Flag            `yaml:"Flags"`
+	Parent     string            `yaml:"Parent"`
+}
+
+type Flag struct {
+	Name       string `yaml:"Name"`
+	Shorthand  string `yaml:"Shorthand"`
+	Usage      string `yaml:"Usage"`
+	Type       string `yaml:"Type"`
+	Var        string `yaml:"Var"`
+	Value      string `yaml:"Value"`
+	Persistent bool   `yaml:"Persistent"`
+	Viper      bool   `yaml:"Viper"`
+}
 
 // genCmd represents the genCmd command
 var genCmd = &cobra.Command{
-	Use:   "genCmd",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "gen file",
+	Short: "generate your cli",
+	Long:  `scaffold your cli application using a yaml config file`,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("genCmd called")
+		f := args[0]
+		cfg, err := readConfig(f)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
+}
+
+func readConfig(f string) (*Cfg, error) {
+	cfg := &Cfg{}
+
+	d, err := os.ReadFile(f)
+	if err != nil {
+		return cfg, err
+	}
+
+	err = yaml.Unmarshal(d, cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func genCommands(cfg *Cfg) error {
+	f, err := os.Create("cmd/commands.go")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = tmpl.ExecuteTemplate(f, "cobra", dc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func init() {
 	rootCmd.AddCommand(genCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// genCmdCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// genCmdCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
