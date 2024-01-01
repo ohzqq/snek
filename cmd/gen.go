@@ -48,6 +48,16 @@ var genCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		err = genCommands(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = genCommandFuncs(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
@@ -74,11 +84,27 @@ func genCommands(cfg *Cfg) error {
 	}
 	defer f.Close()
 
-	err = tmpl.ExecuteTemplate(f, "cobra", dc)
+	err = tmpl.ExecuteTemplate(f, "cobra", cfg)
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func genCommandFuncs(cfg *Cfg) error {
+	for _, c := range cfg.Commands {
+		f, err := os.Create("cmd/" + c.Name + ".go")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		err = tmpl.ExecuteTemplate(f, "run", c.Name)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
