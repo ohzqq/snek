@@ -15,14 +15,15 @@ type Cfg struct {
 }
 
 type Cmd struct {
-	Use     string `yaml:"Use"`
-	Name    string `yaml:"Name"`
-	Short   string `yaml:"Short"`
-	Long    string `yaml:"Long"`
+	Args    []Arg  `yaml:"Args"`
 	Aliases string `yaml:"Aliases"`
-	Run     string `yaml:"Run"`
 	Flags   []Flag `yaml:"Flags"`
+	Long    string `yaml:"Long"`
+	Name    string `yaml:"Name"`
 	Parent  string `yaml:"Parent"`
+	Run     string `yaml:"Run"`
+	Short   string `yaml:"Short"`
+	Use     string `yaml:"Use"`
 }
 
 type Flag struct {
@@ -34,6 +35,11 @@ type Flag struct {
 	Value      string `yaml:"Value"`
 	Persistent bool   `yaml:"Persistent"`
 	Viper      bool   `yaml:"Viper"`
+}
+
+type Arg struct {
+	Required bool   `yaml:"Required"`
+	Name     string `yaml:"Name"`
 }
 
 // genCmd represents the genCmd command
@@ -110,7 +116,7 @@ func genCommandFuncs(cfg *Cfg) error {
 		}
 		defer f.Close()
 
-		err = tmpl.ExecuteTemplate(f, "run", c.Name)
+		err = tmpl.ExecuteTemplate(f, "run", c)
 		if err != nil {
 			return err
 		}
@@ -121,6 +127,15 @@ func genCommandFuncs(cfg *Cfg) error {
 		//}
 	}
 	return nil
+}
+
+func (cmd Cmd) Cobra() *cobra.Command {
+	return &cobra.Command{
+		Use: cmd.Use,
+		//Aliases: cmd.Aliases,
+		Short: cmd.Short,
+		Long:  cmd.Long,
+	}
 }
 
 func init() {
