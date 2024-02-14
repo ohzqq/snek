@@ -10,7 +10,6 @@ type Flag struct {
 	Shorthand  string `yaml:"Shorthand"`
 	Usage      string `yaml:"Usage"`
 	Type       string `yaml:"Type"`
-	Var        string `yaml:"Var"`
 	Value      string `yaml:"Value"`
 	Persistent bool   `yaml:"Persistent"`
 	Viper      bool   `yaml:"Viper"`
@@ -74,4 +73,14 @@ func (f Flag) short() string {
 	}
 
 	return ""
+}
+
+func (f Flag) Changed() string {
+	var cmd strings.Builder
+
+	i := fmt.Sprintf(`if cmd.Flags().Changed("%s") {`, f.Name)
+	cmd.WriteString(i)
+	cmd.WriteString("\n// todo\n}\n")
+
+	return cmd.String()
 }

@@ -45,14 +45,6 @@ func (cmd Cmd) fields() []string {
 	return snek
 }
 
-func fmtCobraVar(name string, snek []string) string {
-	return fmt.Sprintf(
-		"var %s = &cobra.Command{\n%s,\n}",
-		name,
-		strings.Join(snek, ",\n"),
-	)
-}
-
 func (cmd Cmd) Name() string {
 	u, _, _ := strings.Cut(cmd.Use, " ")
 	return u + "Cmd"
@@ -68,4 +60,26 @@ func (cmd Cmd) add() string {
 		p = cmd.Parent
 	}
 	return fmt.Sprintf("%s.AddCommand(%s)", p, cmd.Name())
+}
+
+func (c Cmd) runFunc() string {
+	var cmd strings.Builder
+	fn := fmt.Sprintf("func %sRun(cmd *cobra.Command, args []string) {\n", c.Name())
+	cmd.WriteString(fn)
+
+	for _, flag := range c.Flags {
+		cmd.WriteString(flag.Changed())
+	}
+
+	cmd.WriteString("println(cmd.Name())\n}\n")
+
+	return cmd.String()
+}
+
+func fmtCobraVar(name string, snek []string) string {
+	return fmt.Sprintf(
+		"var %s = &cobra.Command{\n%s,\n}",
+		name,
+		strings.Join(snek, ",\n"),
+	)
 }
