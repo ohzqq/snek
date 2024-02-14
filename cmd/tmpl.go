@@ -37,12 +37,15 @@ var (
 	{{$cmd}}Cobra *cobra.Command
 )
 {{end}}
+{{end}}
 
+{{define "init"}}
 func init() {
-{{- range .Commands -}}
+{{- range .Cmds -}}
 	{{- $cmd := .Name -}}
-	
+
 	{{$cmd}}Cobra = NewCobraCmd({{$cmd}})
+	{{$cmd}}Cobra.Run = {{$cmd}}Run
 
 	{{- with .Parent}}
 		{{.}}Cobra.AddCommand({{$cmd}}Cobra)

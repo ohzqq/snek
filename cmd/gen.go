@@ -10,8 +10,9 @@ import (
 )
 
 type Cfg struct {
-	Viper    bool  `yaml:"Viper"`
-	Commands []Cmd `yaml:"Commands"`
+	Viper    bool   `yaml:"Viper"`
+	Commands []*Cmd `yaml:"Commands"`
+	Cmds     []Command
 }
 
 type Command interface {
@@ -24,7 +25,6 @@ type Command interface {
 	Run() string
 	Short() string
 	Use() string
-	Runner() func(cmd *cobra.Command, args []string)
 }
 
 type Cmd struct {
@@ -116,8 +116,9 @@ var genCmd = &cobra.Command{
 	},
 }
 
+var cfg = &Cfg{}
+
 func readConfig(f string) (*Cfg, error) {
-	cfg := &Cfg{}
 
 	d, err := os.ReadFile(f)
 	if err != nil {
@@ -132,6 +133,25 @@ func readConfig(f string) (*Cfg, error) {
 	return cfg, nil
 }
 
+func genInit(cfg *Cfg) error {
+	f, err := os.Open("cmd/commands.go")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = tmpl.ExecuteTemplate(f, "init", cfg)
+	if err != nil {
+		return err
+	}
+
+	err = fmtCommands("cmd/commands.go")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func genCommands(cfg *Cfg) error {
 	f, err := os.Create("cmd/commands.go")
 	if err != nil {
@@ -140,6 +160,15 @@ func genCommands(cfg *Cfg) error {
 	defer f.Close()
 
 	err = tmpl.ExecuteTemplate(f, "cobra", cfg)
+	if err != nil {
+		return err
+	}
+
+	for _, cmd := range cfg.Commands {
+		cfg.Cmds = append(cfg.Cmds, cmd)
+	}
+
+	err = tmpl.ExecuteTemplate(f, "init", cfg)
 	if err != nil {
 		return err
 	}
@@ -184,7 +213,7 @@ func NewCobraCmd(cmd Command) *cobra.Command {
 		Aliases: cmd.Aliases(),
 		Short:   cmd.Short(),
 		Long:    cmd.Long(),
-		Run:     cmd.Runner(),
+		//Run:     cmd.Runner(),
 	}
 }
 
