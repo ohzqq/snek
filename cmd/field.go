@@ -22,7 +22,7 @@ const (
 func (f Field) fmtField(v ...string) string {
 	switch f {
 	case Aliases:
-		return fmtSlice(f, v)
+		return fmtSliceField(f, v)
 	default:
 		return fmtField(f, v[0])
 	}
@@ -32,12 +32,16 @@ func quote(v string) string {
 	return `"` + v + `"`
 }
 
-func fmtSlice(n Field, vals []string) string {
+func fmtSlice(vals []string) string {
 	s := make([]string, len(vals))
 	for i, v := range vals {
 		s[i] = `"` + v + `"`
 	}
-	return fmt.Sprintf("%s: []string{%s}", n, strings.Join(s, ","))
+	return strings.Join(s, ",")
+}
+
+func fmtSliceField(n Field, vals []string) string {
+	return fmt.Sprintf("%s: []string{%s}", n, fmtSlice(vals))
 }
 
 func fmtField(n Field, v string) string {

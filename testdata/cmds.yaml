@@ -23,8 +23,10 @@ Commands:
       Name: persistent
       Usage: "a persistent string flag"
       Persistent: true
-    
 - Use: "bar"
   Short: bar command
   Long: this is a sub command of foo
   Parent: fooCmd
+  Exec: 
+  - echo
+  - this is a shell command

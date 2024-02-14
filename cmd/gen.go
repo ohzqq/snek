@@ -22,14 +22,6 @@ var genCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		//err = cfg.GenCmds()
-		//if err != nil {
-		//log.Fatal(err)
-		//}
-		//println(cfg.root())
-
-		//println(cfg.Cmds())
-
 		d, err := os.Create("cmd/commands.go")
 		if err != nil {
 			log.Fatal(err)
