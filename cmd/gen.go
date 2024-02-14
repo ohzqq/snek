@@ -15,15 +15,15 @@ type Cfg struct {
 }
 
 type Cmd struct {
-	Args    []Arg  `yaml:"Args"`
-	Aliases string `yaml:"Aliases"`
-	Flags   []Flag `yaml:"Flags"`
-	Long    string `yaml:"Long"`
-	Name    string `yaml:"Name"`
-	Parent  string `yaml:"Parent"`
-	Run     string `yaml:"Run"`
-	Short   string `yaml:"Short"`
-	Use     string `yaml:"Use"`
+	Args    []Arg    `yaml:"Args"`
+	Aliases []string `yaml:"Aliases"`
+	Flags   []Flag   `yaml:"Flags"`
+	Long    string   `yaml:"Long"`
+	Name    string   `yaml:"Name"`
+	Parent  string   `yaml:"Parent"`
+	Run     string   `yaml:"Run"`
+	Short   string   `yaml:"Short"`
+	Use     string   `yaml:"Use"`
 }
 
 type Flag struct {
@@ -131,13 +131,13 @@ func genCommandFuncs(cfg *Cfg) error {
 
 func (cmd Cmd) Cobra() *cobra.Command {
 	return &cobra.Command{
-		Use: cmd.Use,
-		//Aliases: cmd.Aliases,
-		Short: cmd.Short,
-		Long:  cmd.Long,
+		Use:     cmd.Use,
+		Aliases: cmd.Aliases,
+		Short:   cmd.Short,
+		Long:    cmd.Long,
 	}
 }
 
 func init() {
-	rootCmd.AddCommand(genCmd)
+	rootCmdCobra.AddCommand(genCmd)
 }

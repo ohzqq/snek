@@ -2,7 +2,8 @@ Viper: true
 Commands:
 - Use: "foo"
   Name: "fooCmd"
-  Aliases: '[]string{"f"}'
+  Aliases: 
+    - f
   Short: foo command
   Long: long explanation
   Parent: rootCmd
