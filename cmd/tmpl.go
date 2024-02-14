@@ -33,6 +33,10 @@ var {{$cmd}} = &cobra.Command{
 }
 {{end}}
 
+{{template "init" .}}
+{{end}}
+
+{{- define "init"}}
 func init() {
 {{- range .Commands -}}
 	{{- $cmd := .Name -}}
@@ -42,12 +46,7 @@ func init() {
 	{{- end}}
 
 	{{range .Flags -}}
-		{{$cmd}}.
-		{{- with .Persistent}}Persistent{{end -}}
-		Flags().{{.Type}}("{{.Name}}",
-		{{- with .Shorthand}}"{{.}}",{{end}}
-		{{- .Value -}}
-		, "{{.Usage}}")
+		{{$cmd}}.{{template "flag" .}}
 
 		{{if .Viper}}
 			viper.BindPFlag("{{.Name}}", {{$cmd}}.Flags().Lookup("{{.Name}}"))
@@ -55,6 +54,14 @@ func init() {
 	{{end -}}
 {{end -}}
 }
+{{end}}
+
+{{define "flag"}}
+		{{- with .Persistent}}Persistent{{end -}}
+		Flags().{{.Type}}("{{.Name}}",
+		{{- with .Shorthand}}"{{.}}",{{end}}
+		{{- .Value -}}
+		, "{{.Usage}}")
 {{end}}
 
 {{define "run" -}}

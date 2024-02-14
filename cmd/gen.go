@@ -15,7 +15,6 @@ type Cfg struct {
 }
 
 type Cmd struct {
-	Args    []Arg    `yaml:"Args"`
 	Aliases []string `yaml:"Aliases"`
 	Flags   []Flag   `yaml:"Flags"`
 	Long    string   `yaml:"Long"`
@@ -35,11 +34,6 @@ type Flag struct {
 	Value      string `yaml:"Value"`
 	Persistent bool   `yaml:"Persistent"`
 	Viper      bool   `yaml:"Viper"`
-}
-
-type Arg struct {
-	Required bool   `yaml:"Required"`
-	Name     string `yaml:"Name"`
 }
 
 // genCmd represents the genCmd command
