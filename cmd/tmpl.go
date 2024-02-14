@@ -19,16 +19,16 @@ import (
 {{range .Commands}}
 	{{- $cmd := .Name -}}
 
-type {{$cmd}}Command struct{Cmd}
+type {{.Use}}Command struct{*Cmd}
 
 var (
-	{{.Use}}Cmd = {{$cmd}}Command{
-		Cmd: Cmd {
-			{{with .Use}}Use: "{{.}}",{{end}}
-			{{with .Short}}Short: "{{.}}",{{end}}
-			{{with .Long}}Long: "{{.}}",{{end}}
+	{{.Use}}Cmd = {{.Use}}Command{
+		Cmd: &Cmd {
+			{{with .Use}}Fuse: "{{.}}",{{end}}
+			{{with .Short}}Fshort: "{{.}}",{{end}}
+			{{with .Long}}Flong: "{{.}}",{{end}}
 			{{- with .Aliases}}
-			Aliases: []string{
+			Faliases: []string{
 				{{range .}}"{{.}}",{{end}}
 			},
 			{{end}}
@@ -42,7 +42,7 @@ func init() {
 {{- range .Commands -}}
 	{{- $cmd := .Name -}}
 	
-	{{$cmd}}Cobra = {{.Use}}Cmd.Cobra()
+	{{$cmd}}Cobra = NewCobraCmd({{$cmd}})
 
 	{{- with .Parent}}
 		{{.}}Cobra.AddCommand({{$cmd}}Cobra)
@@ -71,11 +71,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (c {{.Name}}Command) Runner(cmd *cobra.Command, args []string) {
-	println(cmd.Name())
+func (c {{.Fuse}}Command) Runner() func(cmd *cobra.Command, args []string) {
+	return {{.Fname}}Run
 }
 
-func {{.Name}}Run(cmd *cobra.Command, args []string) {
+func {{.Fname}}Run(cmd *cobra.Command, args []string) {
 	println(cmd.Name())
 }
 {{end}}

@@ -14,16 +14,65 @@ type Cfg struct {
 	Commands []Cmd `yaml:"Commands"`
 }
 
+type Command interface {
+	Args() []Arg
+	Aliases() []string
+	Flags() []Flag
+	Long() string
+	Name() string
+	Parent() string
+	Run() string
+	Short() string
+	Use() string
+	Runner() func(cmd *cobra.Command, args []string)
+}
+
 type Cmd struct {
-	Args    []Arg    `yaml:"Args"`
-	Aliases []string `yaml:"Aliases"`
-	Flags   []Flag   `yaml:"Flags"`
-	Long    string   `yaml:"Long"`
-	Name    string   `yaml:"Name"`
-	Parent  string   `yaml:"Parent"`
-	Run     string   `yaml:"Run"`
-	Short   string   `yaml:"Short"`
-	Use     string   `yaml:"Use"`
+	Fargs    []Arg    `yaml:"Args"`
+	Faliases []string `yaml:"Aliases"`
+	Fflags   []Flag   `yaml:"Flags"`
+	Flong    string   `yaml:"Long"`
+	Fname    string   `yaml:"Name"`
+	Fparent  string   `yaml:"Parent"`
+	Frun     string   `yaml:"Run"`
+	Fshort   string   `yaml:"Short"`
+	Fuse     string   `yaml:"Use"`
+}
+
+func (c *Cmd) Args() []Arg {
+	return c.Fargs
+}
+
+func (c *Cmd) Aliases() []string {
+	return c.Faliases
+}
+
+func (c *Cmd) Flags() []Flag {
+	return c.Fflags
+}
+
+func (c *Cmd) Long() string {
+	return c.Flong
+}
+
+func (c *Cmd) Name() string {
+	return c.Fname
+}
+
+func (c *Cmd) Parent() string {
+	return c.Fparent
+}
+
+func (c *Cmd) Run() string {
+	return c.Frun
+}
+
+func (c *Cmd) Short() string {
+	return c.Fshort
+}
+
+func (c *Cmd) Use() string {
+	return c.Fuse
 }
 
 type Flag struct {
@@ -109,7 +158,7 @@ func fmtCommands(file string) error {
 
 func genCommandFuncs(cfg *Cfg) error {
 	for _, c := range cfg.Commands {
-		file := "cmd/" + c.Name + ".go"
+		file := "cmd/" + c.Name() + ".go"
 		f, err := os.Create(file)
 		if err != nil {
 			return err
@@ -129,12 +178,13 @@ func genCommandFuncs(cfg *Cfg) error {
 	return nil
 }
 
-func (cmd Cmd) Cobra() *cobra.Command {
+func NewCobraCmd(cmd Command) *cobra.Command {
 	return &cobra.Command{
-		Use:     cmd.Use,
-		Aliases: cmd.Aliases,
-		Short:   cmd.Short,
-		Long:    cmd.Long,
+		Use:     cmd.Use(),
+		Aliases: cmd.Aliases(),
+		Short:   cmd.Short(),
+		Long:    cmd.Long(),
+		Run:     cmd.Runner(),
 	}
 }
 
