@@ -19,40 +19,30 @@ import (
 {{range .Commands}}
 	{{- $cmd := .Name -}}
 
-type {{.Use}}Command struct{*Cmd}
-
-var (
-	{{.Use}}Cmd = {{.Use}}Command{
-		Cmd: &Cmd {
-			{{with .Use}}Fuse: "{{.}}",{{end}}
-			{{with .Short}}Fshort: "{{.}}",{{end}}
-			{{with .Long}}Flong: "{{.}}",{{end}}
-			{{- with .Aliases}}
-			Faliases: []string{
-				{{range .}}"{{.}}",{{end}}
-			},
-			{{end}}
-		},
-	}
-	{{$cmd}}Cobra *cobra.Command
-)
-{{end}}
+var {{$cmd}} = &cobra.Command{
+	{{with .Use}}Use: "{{.}}",{{end}}
+	Run: {{$cmd}}Run,
+	{{with .Aliases}}Aliases: []string{
+		{{- range .}}
+		"{{.}}",
+	},
+	{{- end}}
+	{{- end}}
+	{{with .Short}}Short: "{{.}}",{{end}}
+	{{with .Long}}Long: "{{.}}",{{end}}
+}
 {{end}}
 
-{{define "init"}}
 func init() {
-{{- range .Cmds -}}
+{{- range .Commands -}}
 	{{- $cmd := .Name -}}
 
-	{{$cmd}}Cobra = NewCobraCmd({{$cmd}})
-	{{$cmd}}Cobra.Run = {{$cmd}}Run
-
 	{{- with .Parent}}
-		{{.}}Cobra.AddCommand({{$cmd}}Cobra)
+		{{.}}.AddCommand({{$cmd}})
 	{{- end}}
 
 	{{range .Flags -}}
-		{{$cmd}}Cobra.
+		{{$cmd}}.
 		{{- with .Persistent}}Persistent{{end -}}
 		Flags().{{.Type}}("{{.Name}}",
 		{{- with .Shorthand}}"{{.}}",{{end}}
@@ -60,7 +50,7 @@ func init() {
 		, "{{.Usage}}")
 
 		{{if .Viper}}
-			viper.BindPFlag("{{.Name}}", {{$cmd}}Cobra.Flags().Lookup("{{.Name}}"))
+			viper.BindPFlag("{{.Name}}", {{$cmd}}.Flags().Lookup("{{.Name}}"))
 		{{end -}}
 	{{end -}}
 {{end -}}
@@ -74,11 +64,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (c {{.Fuse}}Command) Runner() func(cmd *cobra.Command, args []string) {
-	return {{.Fname}}Run
-}
-
-func {{.Fname}}Run(cmd *cobra.Command, args []string) {
+func {{.Name}}Run(cmd *cobra.Command, args []string) {
 	println(cmd.Name())
 }
 {{end}}

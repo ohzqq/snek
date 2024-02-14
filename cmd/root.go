@@ -7,7 +7,7 @@ import (
 )
 
 // rootCmd represents the base command when called without any subcommands
-var rootCmdCobra = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "snek",
 	Short: "generate a cli for cobra",
 	Long: `A Cobra companion for quickly generating a cli with a config file.
@@ -15,7 +15,7 @@ var rootCmdCobra = &cobra.Command{
 }
 
 func Execute() {
-	err := rootCmdCobra.Execute()
+	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}

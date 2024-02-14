@@ -10,69 +10,20 @@ import (
 )
 
 type Cfg struct {
-	Viper    bool   `yaml:"Viper"`
-	Commands []*Cmd `yaml:"Commands"`
-	Cmds     []Command
-}
-
-type Command interface {
-	Args() []Arg
-	Aliases() []string
-	Flags() []Flag
-	Long() string
-	Name() string
-	Parent() string
-	Run() string
-	Short() string
-	Use() string
+	Viper    bool  `yaml:"Viper"`
+	Commands []Cmd `yaml:"Commands"`
 }
 
 type Cmd struct {
-	Fargs    []Arg    `yaml:"Args"`
-	Faliases []string `yaml:"Aliases"`
-	Fflags   []Flag   `yaml:"Flags"`
-	Flong    string   `yaml:"Long"`
-	Fname    string   `yaml:"Name"`
-	Fparent  string   `yaml:"Parent"`
-	Frun     string   `yaml:"Run"`
-	Fshort   string   `yaml:"Short"`
-	Fuse     string   `yaml:"Use"`
-}
-
-func (c *Cmd) Args() []Arg {
-	return c.Fargs
-}
-
-func (c *Cmd) Aliases() []string {
-	return c.Faliases
-}
-
-func (c *Cmd) Flags() []Flag {
-	return c.Fflags
-}
-
-func (c *Cmd) Long() string {
-	return c.Flong
-}
-
-func (c *Cmd) Name() string {
-	return c.Fname
-}
-
-func (c *Cmd) Parent() string {
-	return c.Fparent
-}
-
-func (c *Cmd) Run() string {
-	return c.Frun
-}
-
-func (c *Cmd) Short() string {
-	return c.Fshort
-}
-
-func (c *Cmd) Use() string {
-	return c.Fuse
+	Args    []Arg    `yaml:"Args"`
+	Aliases []string `yaml:"Aliases"`
+	Flags   []Flag   `yaml:"Flags"`
+	Long    string   `yaml:"Long"`
+	Name    string   `yaml:"Name"`
+	Parent  string   `yaml:"Parent"`
+	Run     string   `yaml:"Run"`
+	Short   string   `yaml:"Short"`
+	Use     string   `yaml:"Use"`
 }
 
 type Flag struct {
@@ -116,9 +67,8 @@ var genCmd = &cobra.Command{
 	},
 }
 
-var cfg = &Cfg{}
-
 func readConfig(f string) (*Cfg, error) {
+	cfg := &Cfg{}
 
 	d, err := os.ReadFile(f)
 	if err != nil {
@@ -133,25 +83,6 @@ func readConfig(f string) (*Cfg, error) {
 	return cfg, nil
 }
 
-func genInit(cfg *Cfg) error {
-	f, err := os.Open("cmd/commands.go")
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	err = tmpl.ExecuteTemplate(f, "init", cfg)
-	if err != nil {
-		return err
-	}
-
-	err = fmtCommands("cmd/commands.go")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func genCommands(cfg *Cfg) error {
 	f, err := os.Create("cmd/commands.go")
 	if err != nil {
@@ -160,15 +91,6 @@ func genCommands(cfg *Cfg) error {
 	defer f.Close()
 
 	err = tmpl.ExecuteTemplate(f, "cobra", cfg)
-	if err != nil {
-		return err
-	}
-
-	for _, cmd := range cfg.Commands {
-		cfg.Cmds = append(cfg.Cmds, cmd)
-	}
-
-	err = tmpl.ExecuteTemplate(f, "init", cfg)
 	if err != nil {
 		return err
 	}
@@ -187,7 +109,7 @@ func fmtCommands(file string) error {
 
 func genCommandFuncs(cfg *Cfg) error {
 	for _, c := range cfg.Commands {
-		file := "cmd/" + c.Name() + ".go"
+		file := "cmd/" + c.Name + ".go"
 		f, err := os.Create(file)
 		if err != nil {
 			return err
@@ -207,16 +129,6 @@ func genCommandFuncs(cfg *Cfg) error {
 	return nil
 }
 
-func NewCobraCmd(cmd Command) *cobra.Command {
-	return &cobra.Command{
-		Use:     cmd.Use(),
-		Aliases: cmd.Aliases(),
-		Short:   cmd.Short(),
-		Long:    cmd.Long(),
-		//Run:     cmd.Runner(),
-	}
-}
-
 func init() {
-	rootCmdCobra.AddCommand(genCmd)
+	rootCmd.AddCommand(genCmd)
 }
