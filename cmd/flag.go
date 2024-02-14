@@ -35,15 +35,43 @@ func (f Flag) flag() string {
 	if f.Persistent {
 		p = "Persistent" + p
 	}
+
+	if f.Type == "" {
+		f.Type = "StringP"
+	}
 	p += f.Type
 
+	return fmt.Sprintf("%s(%s)", p, f.args())
+}
+
+func (f Flag) args() string {
 	var pos []string
+
 	pos = append(pos, quote(f.Name))
-	if f.Shorthand != "" {
-		pos = append(pos, quote(f.Shorthand))
+
+	if s := f.short(); s != "" {
+		pos = append(pos, quote(s))
 	}
+
+	if f.Value == "" {
+		f.Value = quote("")
+	}
+
 	pos = append(pos, f.Value)
+
 	pos = append(pos, quote(f.Usage))
 
-	return fmt.Sprintf("%s(%s)", p, strings.Join(pos, ","))
+	return strings.Join(pos, ",")
+}
+
+func (f Flag) short() string {
+	if f.Shorthand != "" {
+		return f.Shorthand
+	}
+
+	if strings.HasSuffix(f.Type, "P") {
+		return string(f.Name[0])
+	}
+
+	return ""
 }

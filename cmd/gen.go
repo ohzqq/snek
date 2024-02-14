@@ -20,22 +20,18 @@ var genCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		err = cfg.GenCmds()
-		if err != nil {
-			log.Fatal(err)
-		}
+		//err = cfg.GenCmds()
+		//if err != nil {
+		//log.Fatal(err)
+		//}
+		//println(cfg.root())
 
-		for _, c := range cfg.Commands {
-			println(c.Cobra())
-			for _, f := range c.Flags {
-				println(f.Gen(c.Name))
-			}
-		}
+		println(cfg.Cmds())
 
-		err = cfg.GenCmdFuncs()
-		if err != nil {
-			log.Fatal(err)
-		}
+		//err = cfg.GenCmdFuncs()
+		//if err != nil {
+		//log.Fatal(err)
+		//}
 	},
 }
 
