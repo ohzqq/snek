@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -88,12 +89,22 @@ func genCommands(cfg *Cfg) error {
 		return err
 	}
 
+	err = fmtCommands("cmd/commands.go")
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+func fmtCommands(file string) error {
+	cmd := exec.Command("go", "fmt", file)
+	return cmd.Run()
 }
 
 func genCommandFuncs(cfg *Cfg) error {
 	for _, c := range cfg.Commands {
-		f, err := os.Create("cmd/" + c.Name + ".go")
+		file := "cmd/" + c.Name + ".go"
+		f, err := os.Create(file)
 		if err != nil {
 			return err
 		}
@@ -103,6 +114,11 @@ func genCommandFuncs(cfg *Cfg) error {
 		if err != nil {
 			return err
 		}
+
+		//err = fmtCommands(file)
+		//if err != nil {
+		//  return err
+		//}
 	}
 	return nil
 }

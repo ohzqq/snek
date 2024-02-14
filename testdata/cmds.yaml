@@ -22,3 +22,19 @@ Commands:
     
 - Use: "poot"
   Name: "pootCmd"
+  Short: poot command
+  Long: long explanation
+  Parent: rootCmd
+  Flags:
+    - Type: StringP
+      Name: turkey
+      Shorthand: t
+      Value: '""'
+      Usage: "gobble gobble"
+      Viper: true
+    - Type: StringP
+      Name: gooble
+      Shorthand: g
+      Value: '""'
+      Usage: "gobble gobble"
+      Persistent: true
