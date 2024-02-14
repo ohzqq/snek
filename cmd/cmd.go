@@ -17,29 +17,33 @@ type Cmd struct {
 }
 
 func (cmd Cmd) Cobra() string {
-	var str strings.Builder
-	str.WriteString("var ")
-	str.WriteString(cmd.Name)
-	str.WriteString(" = &cobra.Command{")
-	str.WriteString("\n")
+	var snek []string
+
+	snek = append(snek, fmt.Sprintf("var %s = &cobra.Command{", cmd.Name))
+
+	snek = append(snek, cmd.run())
 
 	if cmd.Use != "" {
-		str.WriteString(fmtField(Use, cmd.Use))
+		snek = append(snek, Use.fmtField(cmd.Use))
 	}
 
 	if cmd.Short != "" {
-		str.WriteString(fmtField(Short, cmd.Short))
+		snek = append(snek, Short.fmtField(cmd.Short))
 	}
 
 	if cmd.Long != "" {
-		str.WriteString(fmtField(Long, cmd.Long))
+		snek = append(snek, Long.fmtField(cmd.Long))
 	}
 
-	str.WriteByte('}')
+	if len(cmd.Aliases) > 0 {
+		snek = append(snek, Aliases.fmtField(cmd.Aliases...))
+	}
 
-	return str.String()
+	snek = append(snek, "}")
+
+	return strings.Join(snek, ",\n")
 }
 
-func fmtField(n Field, v string) string {
-	return fmt.Sprintf("%s: \"%s\",\n", n, v)
+func (cmd Cmd) run() string {
+	return fmt.Sprintf("Run: %sRun", cmd.Name)
 }

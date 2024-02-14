@@ -7,20 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Field int
-
-//go:generate stringer -type Field
-const (
-	Aliases Field = iota
-	Flags
-	Long
-	Name
-	Parent
-	Run
-	Short
-	Use
-)
-
 // genCmd represents the genCmd command
 var genCmd = &cobra.Command{
 	Use:   "gen file",
@@ -41,6 +27,9 @@ var genCmd = &cobra.Command{
 
 		for _, c := range cfg.Commands {
 			println(c.Cobra())
+			for _, f := range c.Flags {
+				println(f.Gen(c.Name))
+			}
 		}
 
 		err = cfg.GenCmdFuncs()
