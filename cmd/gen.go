@@ -5,10 +5,10 @@ package cmd
 import (
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // genCmd represents the genCmd command
@@ -16,9 +16,8 @@ var genCmd = &cobra.Command{
 	Use:   "gen file",
 	Short: "generate your cli",
 	Long:  `scaffold your cli application using a yaml config file`,
-	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		f := args[0]
+		f := viper.GetString("config")
 		err := readConfig(f)
 		if err != nil {
 			log.Fatal(err)
@@ -62,11 +61,6 @@ var genCmd = &cobra.Command{
 		//log.Fatal(err)
 		//}
 	},
-}
-
-func fmtCommands(file string) error {
-	cmd := exec.Command("go", "fmt", file)
-	return cmd.Run()
 }
 
 func init() {
