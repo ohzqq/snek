@@ -62,6 +62,11 @@ func (cfg *Cfg) root() string {
 
 func (cfg *Cfg) Init() string {
 	snek := []string{"func init() {"}
+
+	for _, flag := range cfg.Root.Flags {
+		snek = append(snek, flag.Gen("rootCmd"))
+	}
+
 	for _, cmd := range cfg.Commands {
 		snek = append(snek, cmd.add())
 		for _, flag := range cmd.Flags {

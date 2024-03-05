@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+//go:embed snek.yaml
+var exampleCfg embed.FS
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "snek",
@@ -18,9 +22,17 @@ var rootCmd = &cobra.Command{
 	Long: `A Cobra companion for quickly generating a cli app with a config file.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := genCLI()
-		if err != nil {
-			log.Fatal(err)
+		if eg := viper.GetBool("example"); eg {
+			d, err := exampleCfg.ReadFile("snek.yaml")
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Printf("%s\n", d)
+		} else {
+			err := genCLI()
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	},
 }
@@ -82,7 +94,7 @@ func init() {
 	viper.BindPFlag("config", rootCmd.PersistentFlags().Lookup("config"))
 
 	rootCmd.PersistentFlags().Bool("example", false, "print example config to stdout")
-	viper.BindPFlag("config", rootCmd.PersistentFlags().Lookup("config"))
+	viper.BindPFlag("example", rootCmd.PersistentFlags().Lookup("example"))
 
 }
 
@@ -98,6 +110,8 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	} else {
+		//println("not found")
 	}
 }
 

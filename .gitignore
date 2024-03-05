@@ -21,7 +21,6 @@
 go.work
 
 testdata
-cmd/commands.go
 cmd/barCmd.go
 cmd/fooCmd.go
 snek.yaml

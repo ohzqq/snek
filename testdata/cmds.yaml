@@ -5,7 +5,7 @@ Root:
   Long: A Cobra companion for quickly generating a cli with a config file.
   NoCommand: true
   Flags:
-    - Name: config
+    - Name: flag
       Usage: "config file"
 Commands:
 - Use: "foo"
