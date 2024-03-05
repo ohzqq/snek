@@ -22,17 +22,9 @@ var rootCmd = &cobra.Command{
 	Long: `A Cobra companion for quickly generating a cli app with a config file.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if eg := viper.GetBool("example"); eg {
-			d, err := exampleCfg.ReadFile("snek.yaml")
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("%s\n", d)
-		} else {
-			err := genCLI()
-			if err != nil {
-				log.Fatal(err)
-			}
+		err := genCLI()
+		if err != nil {
+			log.Fatal(err)
 		}
 	},
 }
@@ -100,10 +92,6 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("config", "c", "./snek.yaml", "config file (default is ./snek.yaml)")
 	viper.BindPFlag("config", rootCmd.PersistentFlags().Lookup("config"))
-
-	rootCmd.PersistentFlags().Bool("example", false, "print example config to stdout")
-	viper.BindPFlag("example", rootCmd.PersistentFlags().Lookup("example"))
-
 }
 
 // initConfig reads in config file and ENV variables if set.
