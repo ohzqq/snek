@@ -5,12 +5,5 @@ import (
 )
 
 func genCmdRun(cmd *cobra.Command, args []string) {
-	out, err := execCmd("echo", "this is a shell command")
-	if err != nil {
-		panic(err)
-	}
-	if out != "" {
-		println(out)
-	}
-
+	println(cmd.Name())
 }

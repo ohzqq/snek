@@ -75,9 +75,12 @@ func (c Cmd) runFunc() string {
 		cmd.WriteString(flag.Changed())
 	}
 
-	if c.shellout() {
-		cmd.WriteString("out, err := execCmd(")
-		cmd.WriteString(fmtSlice(c.Exec))
+	switch {
+	case c.shellout():
+		cmd.WriteString(`out, err := execCmd("`)
+		cmd.WriteString(c.Exec[0])
+		cmd.WriteString(`", `)
+		cmd.WriteString(c.Exec[1])
 		cmd.WriteString(")\n")
 		cmd.WriteString("if err != nil {\n")
 		cmd.WriteString("panic(err)\n")
@@ -86,7 +89,8 @@ func (c Cmd) runFunc() string {
 		cmd.WriteByte('\n')
 		cmd.WriteString("println(out)")
 		cmd.WriteString("}\n")
-	} else {
+	case c.NoCommand:
+	default:
 		cmd.WriteString("println(cmd.Name())")
 	}
 

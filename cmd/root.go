@@ -37,6 +37,14 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+func getExampleCfg() string {
+	d, err := exampleCfg.ReadFile("snek.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return "\n" + string(d)
+}
+
 func genCLI() error {
 	f := viper.GetString("config")
 	err := readConfig(f)

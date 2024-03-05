@@ -5,7 +5,7 @@ import (
 )
 
 func configCmdRun(cmd *cobra.Command, args []string) {
-	out, err := execCmd("echo", "this is a shell command")
+	out, err := execCmd("echo", getExampleCfg())
 	if err != nil {
 		panic(err)
 	}
